@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity()
@@ -13,10 +13,12 @@ export class Invoice {
 	@Column()
 	location: string;
 
-	@Column({ type: 'numeric', precision: 10, scale: 2, default: 0.00 })
+	@Column({ type: 'numeric', precision: 10, scale: 2, default: 1000.00 })
 	balance: number;
 
-	@ManyToOne(() => User, (user: { invoice: any; }) => user.invoice)
+	@ManyToOne(() => User, (user: { invoice: Invoice; }) => user.invoice)
+	@JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
 	user: User;
-
+	// @Column()
+	// user_id: number;
 }

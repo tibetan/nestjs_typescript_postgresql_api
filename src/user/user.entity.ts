@@ -9,7 +9,7 @@ export class User {
 	@Column()
 	email: string;
 
-	@OneToMany(() => Invoice, (invoice: { user: any; }) => invoice.user)
+	@OneToMany(() => Invoice, (invoice: { user: User; }) => invoice.user)
 	invoices: Invoice[];
 
 }
