@@ -23,7 +23,7 @@ $ docker-compose up -d --build
 
 ```bash
 POSTGRES_PASSWORD=postgres
-POSTGRES_USERNAME='postgres'
+POSTGRES_USERNAME=postgres
 POSTGRES_DATABASE=postgres
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
