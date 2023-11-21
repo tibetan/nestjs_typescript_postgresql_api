@@ -1,7 +1,8 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
+import { Repository, EntityManager, FindOneOptions, DeepPartial } from 'typeorm';
 import { InvoiceDto } from './dto/invoice.dto';
+import { TransferDto } from './dto/transfer.dto';
 import { Invoice } from './invoice.entity';
 import { User } from '../user/user.entity';
 
@@ -10,6 +11,8 @@ export class InvoiceService {
 	constructor(
 		@InjectRepository(Invoice)
 		private readonly invoiceRepository: Repository<Invoice>,
+		@InjectEntityManager()
+		private readonly entityManager: EntityManager,
 	) {}
 
 	getUserIdIfHeaderExists(xUserId: number): number {
@@ -99,6 +102,39 @@ export class InvoiceService {
 
 	async updateNameById(id: number, name: string): Promise<void> {
 		this.invoiceRepository.update(id, { name })
+	}
+
+	async transferCrowns(
+		dto: TransferDto,
+		user: User,
+	): Promise<void> {
+		return this.entityManager.transaction(async transactionalEntityManager => {
+			const senderOptions: FindOneOptions<Invoice> = {
+				where: {
+					id: dto.senderInvoiceId,
+					user: user,
+				},
+			};
+			const receiverOptions: FindOneOptions<Invoice> = {
+				where: {
+					id: dto.receiverInvoiceId,
+				},
+			};
+			const senderInvoice = await transactionalEntityManager.findOne(Invoice, senderOptions);
+			const receiverInvoice = await transactionalEntityManager.findOne(Invoice, receiverOptions);
+
+			if (!senderInvoice || !receiverInvoice) {
+				throw new NotFoundException('Sender or receiver invoice not found');
+			}
+
+			senderInvoice.balance -= dto.amount;
+			if (senderInvoice.balance <= 0) {
+				throw new NotFoundException('Insufficient funds and the invoice cannot be equal to zero');
+			}
+			receiverInvoice.balance += dto.amount;
+
+			await transactionalEntityManager.save(Invoice, [senderInvoice, receiverInvoice] as DeepPartial<Invoice>[]);
+		});
 	}
 
 }
