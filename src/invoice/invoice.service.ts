@@ -3,6 +3,7 @@ import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
 import { Repository, EntityManager, FindOneOptions, DeepPartial } from 'typeorm';
 import { InvoiceDto } from './dto/invoice.dto';
 import { TransferDto } from './dto/transfer.dto';
+import { ReplenishDto } from './dto/replenish.dto';
 import { Invoice } from './invoice.entity';
 import { User } from '../user/user.entity';
 
@@ -135,6 +136,27 @@ export class InvoiceService {
 
 			await transactionalEntityManager.save(Invoice, [senderInvoice, receiverInvoice] as DeepPartial<Invoice>[]);
 		});
+	}
+
+	async findInvoiceForReplenish(dto: ReplenishDto): Promise<Invoice> {
+		if (dto.password != '123456') {
+			throw new NotFoundException('Password not valid');
+		}
+
+		const invoice = await this.invoiceRepository.findOne({
+			where: { id: dto.invoiceId }
+		});
+
+		if (!invoice) {
+			throw new NotFoundException(`Invoice with id ${dto.invoiceId} not found`);
+		}
+
+		return invoice;
+	}
+
+	async replenish(invoice: Invoice): Promise<void> {
+		const newBalance = invoice.balance + 5000;
+		this.invoiceRepository.update(invoice.id, { balance: newBalance });
 	}
 
 }

@@ -8,7 +8,8 @@ import {
 	Param,
 	NotFoundException,
 	Headers,
-	Query
+	Query,
+	HttpCode
 } from '@nestjs/common';
 import { InvoiceDto } from './dto/invoice.dto';
 import { InvoiceService } from './invoice.service';
@@ -66,6 +67,7 @@ export class InvoiceController {
 		await this.invoiceService.deleteById(id);
 	}
 
+	@HttpCode(200)
 	@Patch(':id')
 	async patch(
 		@Headers('X-User-Id') xUserId: number,
