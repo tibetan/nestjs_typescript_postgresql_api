@@ -36,10 +36,11 @@ PGADMIN_DEFAULT_PASSWORD=pgadmin4
 
 ## Configuring Postgres DB
 
-1. In the left-hand sidebar, click `Servers` to expand the `Servers` menu.
-2. Right-click on `Servers` and select `Register -> Server`.
-3. In the `Genera`l tab of the `Create - Server` dialog, we can give the server a name of our choice.
-4. In the `Connection tab`, fill in the following details:
+1. Login to admin with credentionals from `.env` file.
+2. In the left-hand sidebar, click `Servers` to expand the `Servers` menu.
+3. Right-click on `Servers` and select `Register -> Server`.
+4. In the `Genera`l tab of the `Create - Server` dialog, we can give the server a name of our choice.
+5. In the `Connection tab`, fill in the following details:
 
 ```bash
 Host name/address: db
@@ -116,9 +117,10 @@ Content-Type: application/json
 - Например, я бы вынес все связанное с переводами между счетами в другой сервис.
 - Я для переводов использовал транзакции для работы с БД.
 В принципе, и для функционала создания/вывода/апдейта счетов тоже в некоторых местах лучше было бы также
-использовать транзакции.
+использовать транзакции, чтобы снизить нагрузку на БД.
 - пароль для запроса пополнения я бы делал с применением библиотеки хэширования паролей `bcrypt` и передавал в запросе его хэш.
 Для безопасности. Я понимаю, что это тестовое, поэтому исп. пароль без хэша.
+- Я не успел использовать pipes для валидации приходящих данных. И декораторы.
 
 ## Stay in touch
 
