@@ -3,7 +3,9 @@ import {
 	Post,
 	Body,
 	Headers,
-	HttpCode
+	HttpCode,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common';
 import { TransferDto } from './dto/transfer.dto';
 import { ReplenishDto } from './dto/replenish.dto';
@@ -17,6 +19,7 @@ export class TransferController {
 		private readonly userService: UserService
 	) {}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post()
 	async transfer(
@@ -28,6 +31,7 @@ export class TransferController {
 		await this.invoiceService.transferCrowns(dto, user);
 	}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('replenish')
 	async replenish(@Body() dto: ReplenishDto): Promise<void> {

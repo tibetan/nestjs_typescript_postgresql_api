@@ -9,7 +9,9 @@ import {
 	NotFoundException,
 	Headers,
 	Query,
-	HttpCode
+	HttpCode,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common';
 import { InvoiceDto } from './dto/invoice.dto';
 import { InvoiceService } from './invoice.service';
@@ -23,10 +25,12 @@ export class InvoiceController {
 		private readonly userService: UserService
 	) {}
 
+	@UsePipes(new ValidationPipe())
 	@Post()
 	async create(
 		@Headers('X-User-Id') xUserId: number,
-		@Body() dto: Omit<InvoiceDto, 'balance'>
+		// @Body() dto: Omit<InvoiceDto, 'balance'>
+		@Body() dto: InvoiceDto
 	): Promise<Invoice> {
 		const userId = this.invoiceService.getUserIdIfHeaderExists(xUserId);
 		const user = await this.userService.findById(userId);
@@ -67,6 +71,7 @@ export class InvoiceController {
 		await this.invoiceService.deleteById(id);
 	}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Patch(':id')
 	async patch(
